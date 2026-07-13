@@ -52,22 +52,12 @@
   }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
-  .container { max-width: 900px; margin: 0 auto; padding: 24px; }
+  .container { max-width: 700px; margin: 0 auto; padding: 24px; }
 
-  .trip-bar { display: flex; gap: 10px; align-items: center;
-              margin-bottom: 20px; flex-wrap: wrap; }
-
-  select, input, button { font-family: var(--sans); font-size: 14px; font-weight: 500; }
-
-  .select-trip {
-    flex: 1; min-width: 200px; background: var(--panel2); color: var(--text);
-    border: 1px solid var(--border2); padding: 9px 12px; border-radius: 4px;
-    cursor: pointer; font-family: var(--mono); font-size: 13px;
-  }
-  .select-trip:focus { outline: none; border-color: var(--cyan); }
+  select, input, textarea, button { font-family: var(--sans); font-size: 14px; font-weight: 500; }
 
   .btn {
-    display: inline-flex; align-items: center; gap: 6px;
+    display: inline-flex; align-items: center; gap: 6px; justify-content: center;
     padding: 9px 16px; border: none; border-radius: 4px; cursor: pointer;
     font-weight: 600; letter-spacing: 0.5px; transition: all 0.15s;
     font-size: 13px; font-family: var(--sans);
@@ -76,9 +66,12 @@
   .btn-green:hover { background: var(--green); color: #000; box-shadow: 0 0 12px rgba(0,229,160,0.4); }
   .btn-amber { background: var(--amber-dim); color: var(--amber); border: 1px solid var(--amber); }
   .btn-amber:hover { background: var(--amber); color: #000; }
+  .btn-cyan { background: var(--cyan-dim); color: var(--cyan); border: 1px solid var(--cyan); }
+  .btn-cyan:hover { background: var(--cyan); color: #000; }
   .btn-ghost { background: transparent; color: var(--text-dim); border: 1px solid var(--border2); }
   .btn-ghost:hover { border-color: var(--text); color: var(--text); }
-  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none !important; }
+  .btn-block { width: 100%; padding: 14px; font-size: 15px; }
 
   .panel { background: var(--panel); border: 1px solid var(--border);
            border-radius: 6px; margin-bottom: 16px; overflow: hidden; }
@@ -91,194 +84,101 @@
                  color: var(--cyan); text-transform: uppercase; }
   .panel-body { padding: 16px; }
 
-  .info-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+  /* Step 1: capture */
+  .capture-row { display: flex; gap: 10px; }
+  .capture-row .btn { flex: 1; padding: 16px; font-size: 14px; }
+  #photo-input, #camera-input { display: none; }
+  .preview-wrap { margin-top: 14px; text-align: center; display: none; }
+  .preview-wrap.show { display: block; }
+  .preview-wrap img { max-width: 100%; max-height: 320px; border-radius: 6px; border: 1px solid var(--border2); }
+  #readPhotoBtn { margin-top: 14px; }
+
+  .spinner { display: none; align-items: center; gap: 10px; justify-content: center;
+             padding: 14px; font-family: var(--mono); font-size: 12px; color: var(--cyan); }
+  .spinner.show { display: flex; }
+  .spinner .ring { width: 16px; height: 16px; border: 2px solid var(--cyan-dim);
+                   border-top-color: var(--cyan); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Step 2: confirm table */
+  .field-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px 14px; }
   .field-group { display: flex; flex-direction: column; gap: 4px; }
+  .field-group.wide { grid-column: 1 / -1; }
   .field-label { font-family: var(--mono); font-size: 10px; color: var(--text-dim);
-                 letter-spacing: 1.5px; text-transform: uppercase; }
+                 letter-spacing: 1.5px; text-transform: uppercase; display: flex; gap: 6px; align-items: center; }
+  .src-badge { font-family: var(--mono); font-size: 9px; letter-spacing: 0.5px;
+               padding: 1px 5px; border-radius: 8px; text-transform: none; }
+  .src-badge.photo       { background: var(--green-dim); color: var(--green); }
+  .src-badge.schedule    { background: var(--cyan-dim); color: var(--cyan); }
+  .src-badge.flightaware { background: var(--cyan-dim); color: var(--cyan); }
+  .src-badge.default     { background: var(--amber-dim); color: var(--amber); }
   .field-input {
     background: var(--panel2); color: var(--text); border: 1px solid var(--border2);
-    padding: 8px 10px; border-radius: 4px; font-family: var(--mono); font-size: 14px;
+    padding: 9px 10px; border-radius: 4px; font-family: var(--mono); font-size: 16px;
     transition: border-color 0.15s; width: 100%;
   }
   .field-input:focus { outline: none; border-color: var(--cyan); }
+  .field-input.readonly { color: var(--green); background: transparent; border-style: dashed; }
+  select.field-input { cursor: pointer; }
+  .field-group.flag { flex-direction: row; align-items: center; gap: 8px; padding-top: 18px; }
+  .field-group.flag input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--cyan); }
+  .field-group.flag label { font-family: var(--mono); font-size: 12px; text-transform: none; }
+  textarea.field-input { resize: vertical; min-height: 60px; font-family: var(--sans); font-size: 15px; }
 
-  /* Paper log table */
-  .paper-log { width: 100%; border-collapse: collapse; margin-bottom: 16px;
-               background: var(--panel); border: 1px solid var(--border); border-radius: 6px;
-               overflow: hidden; font-family: var(--mono); }
-  .paper-log th {
-    background: var(--panel2); padding: 10px 16px; text-align: center;
-    font-size: 10px; letter-spacing: 1.5px; color: var(--text-dim);
-    text-transform: uppercase; border-bottom: 1px solid var(--border);
-    border-right: 1px solid var(--border);
+  .diversion-banner {
+    display: none; margin-top: 10px; padding: 10px 12px; border-radius: 4px;
+    background: var(--red-dim); border: 1px solid var(--red); color: var(--red);
+    font-family: var(--mono); font-size: 12px;
   }
-  .paper-log th:first-child { text-align: left; width: 90px; }
-  .paper-log th:last-child { border-right: none; }
-  .paper-log td {
-    padding: 10px 16px; text-align: center; border-bottom: 1px solid var(--border);
-    border-right: 1px solid var(--border); font-size: 22px;
-  }
-  .paper-log td:first-child {
-    font-size: 11px; letter-spacing: 1px; color: var(--text-dim);
-    text-align: left; text-transform: uppercase; border-right: 1px solid var(--border);
-  }
-  .paper-log td:last-child { border-right: none; }
-  .paper-log tr:last-child td { border-bottom: none; }
-  .paper-log tr.row-today td { background: #0f1f18; }
-  .paper-log tr.row-total td { background: #0f1a10; }
-  .paper-log .val-green { color: var(--green); }
-  .paper-log .val-amber { color: var(--amber); }
-  .paper-log .val-dim   { color: var(--text-dim); font-size: 14px; }
-  .paper-log input.log-input {
-    background: transparent; border: none; border-bottom: 1px solid var(--border2);
-    color: var(--text); font-family: var(--mono); font-size: 22px;
-    text-align: center; width: 100%; padding: 0;
-  }
-  .paper-log input.log-input:focus { outline: none; border-bottom-color: var(--cyan); }
+  .diversion-banner.show { display: block; }
 
-  /* Legs table */
-  .legs-table { width: 100%; border-collapse: collapse; }
-  .legs-table th {
-    font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px;
+  .ocr-note { font-family: var(--mono); font-size: 11px; color: var(--text-dim); margin-top: 10px; }
+
+  .fa-result {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 12px; margin-bottom: 6px; border-radius: 4px;
+    background: var(--panel2); border: 1px solid var(--border2);
+    cursor: pointer; font-family: var(--mono); font-size: 13px; transition: all 0.15s;
+  }
+  .fa-result:hover { border-color: var(--amber); background: rgba(255,176,32,0.08); }
+  .fa-result .fa-route { color: var(--text); }
+  .fa-result .fa-times { color: var(--amber); }
+
+  /* Recent submissions */
+  .recent-table { width: 100%; border-collapse: collapse; }
+  .recent-table th {
+    font-family: var(--mono); font-size: 10px; letter-spacing: 1px;
     color: var(--text-dim); text-transform: uppercase; padding: 8px 10px;
     text-align: left; border-bottom: 1px solid var(--border); background: var(--panel2);
   }
-  .legs-table td { padding: 6px 6px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-  .legs-table tr:last-child td { border-bottom: none; }
-  .legs-table tr:hover td { background: rgba(255,255,255,0.02); }
-
-  .leg-num { font-family: var(--mono); font-size: 13px; color: var(--text-dim);
-             padding: 0 10px; text-align: center; }
-
-  .td-input {
-    background: var(--panel2); color: var(--text); border: 1px solid transparent;
-    padding: 6px 8px; border-radius: 3px; font-family: var(--mono); font-size: 14px;
-    width: 100%; transition: border-color 0.15s;
-  }
-  .td-input:focus { outline: none; border-color: var(--cyan); background: var(--bg); }
-  .td-input.time { width: 68px; text-align: center; letter-spacing: 2px; }
-  .td-input.date { width: 72px; }
-
-  .calc-cell { font-family: var(--mono); font-size: 14px;
-               padding: 6px 10px; text-align: center; white-space: nowrap; }
-  .calc-cell.time  { color: var(--amber); }
-  .calc-cell.tenth { color: var(--green); font-size: 18px; }
-  .calc-cell.empty { color: var(--text-dim); }
-
-  .acars-btn {
-    background: var(--cyan-dim); color: var(--cyan); border: 1px solid var(--cyan-dim);
-    padding: 5px 10px; border-radius: 3px; cursor: pointer;
-    font-size: 12px; font-family: var(--mono); transition: all 0.15s; white-space: nowrap;
-  }
-  .acars-btn:hover { background: var(--cyan); color: #000; }
-  .acars-btn.loading { opacity: 0.6; cursor: wait; }
-
-  .delete-btn {
-    background: transparent; color: var(--red-dim); border: none;
-    cursor: pointer; font-size: 16px; padding: 4px 8px; border-radius: 3px;
-    transition: color 0.15s;
-  }
-  .delete-btn:hover { color: var(--red); }
-
-  /* Modal */
-  .modal-overlay {
-    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-    z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(4px);
-  }
-  .modal-overlay.open { display: flex; }
-  .modal {
-    background: var(--panel); border: 1px solid var(--border2);
-    border-radius: 8px; padding: 24px; width: 400px; max-width: 95vw;
-  }
-  .modal h2 { font-family: var(--mono); font-size: 12px; letter-spacing: 2px;
-              color: var(--cyan); text-transform: uppercase; margin-bottom: 20px; }
-  .modal-fields { display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px; }
-  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
-
-  .empty-state { text-align: center; padding: 48px 24px;
+  .recent-table td { padding: 8px 10px; border-bottom: 1px solid var(--border);
+                      font-family: var(--mono); font-size: 13px; }
+  .recent-table tr:last-child td { border-bottom: none; }
+  .status-pill { font-size: 10px; padding: 2px 7px; border-radius: 8px; letter-spacing: 0.5px; }
+  .status-pill.created   { background: var(--green-dim); color: var(--green); }
+  .status-pill.duplicate { background: var(--amber-dim); color: var(--amber); }
+  .status-pill.error     { background: var(--red-dim); color: var(--red); }
+  .empty-state { text-align: center; padding: 32px 24px;
                  color: var(--text-dim); font-family: var(--mono); font-size: 13px; }
-  .empty-state .big { font-size: 40px; margin-bottom: 12px; opacity: 0.3; }
 
   #toast {
     position: fixed; bottom: 24px; right: 24px;
     background: var(--panel2); border: 1px solid var(--green);
     color: var(--green); font-family: var(--mono); font-size: 12px;
-    padding: 10px 18px; border-radius: 4px;
+    padding: 10px 18px; border-radius: 4px; max-width: 80vw;
     transform: translateY(60px); opacity: 0; transition: all 0.25s; z-index: 200;
   }
   #toast.show { transform: translateY(0); opacity: 1; }
   #toast.error { border-color: var(--red); color: var(--red); }
 
-  #acars-file-input { display: none; }
-
-  /* ── Mobile / portrait ─────────────────────────────────────────── */
   @media (max-width: 640px) {
     header { padding: 12px 14px; }
     .container { padding: 14px; }
-
-    /* Stop iOS zoom-on-focus: form controls need >=16px */
-    select, input, button, .field-input, .select-trip,
-    .td-input, .td-input.time, .td-input.date { font-size: 16px; }
-
-    /* Trip bar: full-width stacked controls */
-    .trip-bar { gap: 8px; }
-    .trip-bar .select-trip { flex: 1 1 100%; }
-    .trip-bar .btn { flex: 1 1 calc(50% - 4px); justify-content: center; }
-
-    /* Summary table: tighter so 3 cols fit */
-    .paper-log th { padding: 8px 6px; font-size: 9px; }
-    .paper-log td { padding: 8px 6px; font-size: 18px; }
-    .paper-log td:first-child,
-    .paper-log th:first-child { width: auto; font-size: 10px; }
-    .paper-log input.log-input { font-size: 18px; }
-
-    /* Legs: turn each row into a labeled card */
-    .legs-table thead { display: none; }
-    .legs-table, .legs-table tbody { display: block; }
-    .legs-table tr {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px 12px;
-      margin: 12px; padding: 14px;
-      background: var(--panel2);
-      border: 1px solid var(--border2); border-radius: 8px;
-    }
-    .legs-table tr:hover td { background: transparent; }
-    .legs-table td {
-      padding: 0; border: none; text-align: left;
-      display: flex; flex-direction: column; gap: 4px; min-width: 0;
-    }
-    .legs-table td[data-label]::before {
-      content: attr(data-label);
-      font-family: var(--mono); font-size: 9px; letter-spacing: 1px;
-      color: var(--text-dim); text-transform: uppercase;
-    }
-    .legs-table .td-input,
-    .legs-table .td-input.time,
-    .legs-table .td-input.date { width: 100%; text-align: left; letter-spacing: 1px; }
-    .legs-table .calc-cell { text-align: left; padding: 0; }
-
-    /* Card grid placement (cells are in fixed source order) */
-    .legs-table td.leg-num {
-      grid-column: 1; grid-row: 1; align-self: center;
-      font-family: var(--mono); font-size: 13px; letter-spacing: 1px;
-      color: var(--cyan); text-transform: uppercase;
-    }
-    .legs-table td.leg-num::before { content: "LEG "; }
-    .legs-table td.del-cell   { grid-column: 2; grid-row: 1; align-items: flex-end; }
-    .legs-table td.del-cell .delete-btn { font-size: 22px; }
-    .legs-table td:nth-child(2) { grid-column: 1 / -1; grid-row: 2; } /* DATE */
-    .legs-table td:nth-child(3) { grid-column: 1; grid-row: 3; }      /* TIME OFF */
-    .legs-table td:nth-child(4) { grid-column: 2; grid-row: 3; }      /* TIME ON */
-    .legs-table td:nth-child(5) { grid-column: 1; grid-row: 4; }      /* FLT TIME */
-    .legs-table td:nth-child(6) { grid-column: 2; grid-row: 4; }      /* HR/TENTH */
-    .legs-table td.acars-cell   { grid-column: 1 / -1; grid-row: 5; }
-    .legs-table td.acars-cell .acars-btn {
-      width: 100%; padding: 12px; font-size: 14px; text-align: center;
-    }
-
-    /* Toast spans the bottom on small screens */
+    select, input, textarea, button, .field-input { font-size: 16px; }
+    .field-grid { grid-template-columns: 1fr 1fr; }
+    .capture-row { flex-direction: column; }
     #toast { left: 16px; right: 16px; bottom: 16px; text-align: center; }
+    .recent-table th:nth-child(4), .recent-table td:nth-child(4) { display: none; } /* hide "off/on" on phones */
   }
 </style>
 </head>
@@ -291,365 +191,516 @@
 
 <div class="container">
 
-  <div class="trip-bar">
-    <select class="select-trip" id="tripSelect" onchange="loadTrip(this.value)">
-      <option value="">— SELECT TRIP —</option>
-    </select>
-    <button class="btn btn-green" onclick="openModal()">+ NEW TRIP</button>
-    <button class="btn btn-amber" id="exportBtn" onclick="exportCSV()" disabled>↓ EXPORT</button>
-    <button class="btn" style="background:var(--red-dim);color:var(--red);border:1px solid var(--red)" onclick="deleteAllTrips()">✕ DELETE ALL</button>
+  <!-- Step 1: capture -->
+  <div class="panel" id="capturePanel">
+    <div class="panel-header"><div class="panel-title">1 · Capture</div></div>
+    <div class="panel-body">
+      <div class="capture-row">
+        <button class="btn btn-cyan" onclick="document.getElementById('photo-input').click()">📁 Choose Photo</button>
+        <button class="btn btn-cyan" onclick="document.getElementById('camera-input').click()">📷 Take Photo</button>
+      </div>
+      <input type="file" id="photo-input" accept="image/*" onchange="onFileChosen(this.files[0])">
+      <input type="file" id="camera-input" accept="image/*" capture="environment" onchange="onFileChosen(this.files[0])">
+
+      <div class="preview-wrap" id="previewWrap">
+        <img id="previewImg" alt="Selected photo">
+      </div>
+
+      <button class="btn btn-green btn-block" id="readPhotoBtn" onclick="readPhoto()" disabled style="margin-top:14px">
+        ▶ Read Photo
+      </button>
+      <div class="spinner" id="ocrSpinner"><span class="ring"></span><span id="ocrSpinnerText">Reading display…</span></div>
+
+      <button class="btn btn-amber btn-block" onclick="toggleFaLookup()" style="margin-top:10px">
+        🛩 Look Up FlightAware
+      </button>
+
+      <div id="faLookupPanel" style="display:none; margin-top:14px">
+        <div class="field-grid">
+          <div class="field-group">
+            <label class="field-label">Tail</label>
+            <input class="field-input" id="fa-tail" placeholder="N22DB">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Date</label>
+            <input class="field-input" type="date" id="fa-date">
+          </div>
+        </div>
+        <button class="btn btn-amber btn-block" onclick="searchFlightAware()" style="margin-top:10px">Search</button>
+        <div class="spinner" id="faSpinner"><span class="ring"></span><span>Searching FlightAware…</span></div>
+        <div id="faResults" style="margin-top:10px"></div>
+      </div>
+
+      <button class="btn btn-ghost btn-block" onclick="manualEntry()" style="margin-top:10px">
+        ✏ Manual Entry (no photo)
+      </button>
+    </div>
   </div>
 
-  <!-- Paper log table -->
-  <table class="paper-log" id="summaryStrip">
-    <thead>
-      <tr>
-        <th>Flight Time</th>
-        <th>Aircraft Hours</th>
-        <th>Aircraft Landings</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr class="row-todate">
-        <td>To Date</td>
-        <td><input class="log-input" id="sumHTD" type="number" step="0.1" placeholder="—" oninput="scheduleSave()"></td>
-        <td><input class="log-input" id="sumLTD" type="number" placeholder="—" oninput="scheduleSave()"></td>
-      </tr>
-      <tr class="row-today">
-        <td>Today</td>
-        <td class="val-green" id="sumToday">—</td>
-        <td class="val-green" id="sumCycles">—</td>
-      </tr>
-      <tr class="row-total">
-        <td>Total</td>
-        <td class="val-amber" id="sumTotal">—</td>
-        <td class="val-amber" id="sumTotalL">—</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <!-- Trip info -->
-  <div class="panel" id="tripPanel" style="display:none">
-    <div class="panel-header">
-      <div class="panel-title">TRIP INFO</div>
-      <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px" onclick="saveTripInfo()">SAVE</button>
-    </div>
+  <!-- Step 2: confirm -->
+  <div class="panel" id="confirmPanel" style="display:none">
+    <div class="panel-header"><div class="panel-title">2 · Confirm</div></div>
     <div class="panel-body">
-      <div class="info-grid">
+      <div class="field-grid">
         <div class="field-group">
-          <div class="field-label">Aircraft</div>
-          <input class="field-input" id="infoAircraft" placeholder="N176KH" oninput="scheduleSave()">
+          <label class="field-label">Date <span class="src-badge" id="src-date"></span></label>
+          <input class="field-input" type="date" id="f-date" onchange="onCoreFieldChange()">
         </div>
         <div class="field-group">
-          <div class="field-label">Date</div>
-          <input class="field-input" id="infoDate" placeholder="23 MAY 26" oninput="scheduleSave()">
+          <label class="field-label">Tail <span class="src-badge" id="src-tail"></span></label>
+          <input class="field-input" id="f-tail" placeholder="N93LA" onchange="onCoreFieldChange()">
         </div>
         <div class="field-group">
-          <div class="field-label">Trip Name</div>
-          <input class="field-input" id="infoName" placeholder="TEB-ACY-PHL" oninput="scheduleSave()">
+          <label class="field-label">Dep <span class="src-badge" id="src-dep"></span></label>
+          <input class="field-input" id="f-dep" placeholder="KIWA" onchange="onCoreFieldChange()">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Arr <span class="src-badge" id="src-arr"></span></label>
+          <input class="field-input" id="f-arr" placeholder="KIWA" onchange="onCoreFieldChange()">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Time Off (Z) <span class="src-badge photo">photo</span></label>
+          <input class="field-input" id="f-off" placeholder="1720" maxlength="4" onchange="onCoreFieldChange()">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Time On (Z) <span class="src-badge photo">photo</span></label>
+          <input class="field-input" id="f-on" placeholder="1853" maxlength="4" onchange="onCoreFieldChange()">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Total Time</label>
+          <input class="field-input readonly" id="f-total" readonly>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Role</label>
+          <select class="field-input" id="f-role">
+            <option value="PIC">PIC</option>
+            <option value="SIC">SIC</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Taxi (hr)</label>
+          <input class="field-input" type="number" step="0.1" id="f-taxi" value="0.3">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Landings</label>
+          <input class="field-input" type="number" step="1" id="f-landings" value="1">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Instrument (hr)</label>
+          <input class="field-input" type="number" step="0.1" id="f-instrument" value="0">
+        </div>
+        <div class="field-group">
+          <label class="field-label">CFI (hr)</label>
+          <input class="field-input" type="number" step="0.1" id="f-cfi" value="0">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Solo (hr)</label>
+          <input class="field-input" type="number" step="0.1" id="f-solo" value="0">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Holds</label>
+          <input class="field-input" type="number" step="1" id="f-holds" value="0">
+        </div>
+        <div class="field-group">
+          <label class="field-label">App. ILS</label>
+          <input class="field-input" type="number" step="1" id="f-app-ils" value="0">
+        </div>
+        <div class="field-group">
+          <label class="field-label">App. GPS</label>
+          <input class="field-input" type="number" step="1" id="f-app-gps" value="0">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Night (hr)</label>
+          <input class="field-input" type="number" step="0.1" id="f-night-hours" value="0" onchange="markTouched('f-night-hours')">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Night Ldg</label>
+          <input class="field-input" type="number" step="1" id="f-night-landings" value="0" onchange="markTouched('f-night-landings')">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Cross Country (hr)</label>
+          <input class="field-input" type="number" step="0.1" id="f-xc" value="0" onchange="markTouched('f-xc')">
+        </div>
+
+        <div class="field-group flag">
+          <input type="checkbox" id="f-intl">
+          <label for="f-intl">International</label>
+        </div>
+        <div class="field-group flag">
+          <input type="checkbox" id="f-ocean">
+          <label for="f-ocean">Ocean crossing</label>
+        </div>
+
+        <div class="field-group wide">
+          <label class="field-label">Comments</label>
+          <textarea class="field-input" id="f-comments" placeholder="Notes about this flight…"></textarea>
         </div>
       </div>
+
+      <div class="diversion-banner" id="diversionBanner"></div>
+      <div class="ocr-note" id="ocrNote"></div>
+
+      <button class="btn btn-amber btn-block" id="submitBtn" onclick="submitFlight()" style="margin-top:16px">
+        ✈ Submit to MyFlightBook
+      </button>
     </div>
   </div>
 
-  <!-- Legs -->
-  <div class="panel" id="legsPanel" style="display:none">
+  <!-- Recent -->
+  <div class="panel" id="recentPanel">
     <div class="panel-header">
-      <div class="panel-title">LEGS</div>
-      <button class="btn btn-green" style="font-size:11px;padding:5px 12px" onclick="addLeg()">+ ADD LEG</button>
+      <div class="panel-title">Recent Submissions</div>
+      <a class="btn btn-ghost" href="/api/flights/export" style="text-decoration:none">↓ Export</a>
     </div>
     <div class="panel-body" style="padding:0">
-      <table class="legs-table">
-        <thead>
-          <tr>
-            <th style="width:36px">#</th>
-            <th>DATE (Z)</th>
-            <th>TIME OFF</th>
-            <th>TIME ON</th>
-            <th>FLT TIME</th>
-            <th>HR/TENTH</th>
-            <th>ACARS</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="legsTbody"></tbody>
+      <table class="recent-table" id="recentTable" style="display:none">
+        <thead><tr><th>Date</th><th>Route</th><th>Tail</th><th>Off/On</th><th>Hrs</th><th>Status</th></tr></thead>
+        <tbody id="recentTbody"></tbody>
       </table>
-      <div id="emptyLegs" class="empty-state" style="display:none">
-        <div class="big">✈</div>
-        <div>No legs yet</div>
-      </div>
+      <div class="empty-state" id="recentEmpty">No flights submitted yet</div>
     </div>
   </div>
 
-</div>
-
-<!-- New trip modal -->
-<div class="modal-overlay" id="modal">
-  <div class="modal">
-    <h2>NEW TRIP</h2>
-    <div class="modal-fields">
-      <div class="field-group">
-        <div class="field-label">Hours To Date</div>
-        <input class="field-input" id="ntHTD" type="number" step="0.1" placeholder="2235.6">
-      </div>
-      <div class="field-group">
-        <div class="field-label">Landings To Date</div>
-        <input class="field-input" id="ntLTD" type="number" placeholder="1028">
-      </div>
-      <div class="field-group">
-        <div class="field-label">Trip Name (optional)</div>
-        <input class="field-input" id="ntName" placeholder="TEB-ACY-PHL">
-      </div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="closeModal()">CANCEL</button>
-      <button class="btn btn-green" onclick="createTrip()">CREATE</button>
-    </div>
-  </div>
 </div>
 
 <div id="toast"></div>
-<input type="file" id="acars-file-input" accept="image/*">
 
 <script>
-let trip = null;
-let saveTimer = null;
-let acarsLegId = null;
-
-async function api(method, path, body) {
-  const opts = { method, headers: {'Content-Type':'application/json'} };
-  if (body) opts.body = JSON.stringify(body);
-  const res = await fetch('/api' + path, opts);
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
-}
+let selectedFile = null;
+let touched = new Set();   // computed fields the pilot has hand-edited since last autocalc
+let autocalcTimer = null;
+let lastGndDist = null;    // from the photo OCR, reused for the diversion check on later schedule lookups
 
 function toast(msg, err=false) {
   const t = document.getElementById('toast');
   t.textContent = msg;
-  t.className = 'show' + (err ? ' error' : '');
-  setTimeout(() => t.className = '', 2500);
+  t.className = err ? 'show error' : 'show';
+  setTimeout(() => t.className = t.className.replace('show', ''), 3200);
 }
 
-async function loadTripList() {
-  const trips = await api('GET', '/trips');
-  const sel = document.getElementById('tripSelect');
-  const cur = sel.value;
-  sel.innerHTML = '<option value="">— SELECT TRIP —</option>';
-  trips.forEach(t => {
-    const o = document.createElement('option');
-    o.value = t.id;
-    o.textContent = `${t.aircraft||'?'} · ${t.date||'?'}${t.name ? ' · '+t.name : ''}`;
-    sel.appendChild(o);
-  });
-  if (cur) sel.value = cur;
+async function api(method, path, body, isForm=false) {
+  const opts = { method, headers: isForm ? {} : {'Content-Type': 'application/json'} };
+  if (body) opts.body = isForm ? body : JSON.stringify(body);
+  const r = await fetch(path, opts);
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(data.message || data.error || `HTTP ${r.status}`);
+  return data;
 }
 
-async function loadTrip(id) {
-  if (!id) {
-    trip = null;
-    document.getElementById('tripPanel').style.display = 'none';
-    document.getElementById('legsPanel').style.display = 'none';
-    document.getElementById('exportBtn').disabled = true;
-    updateSummary(null); return;
-  }
-  trip = await api('GET', `/trips/${id}`);
-  render();
+function onFileChosen(file) {
+  if (!file) return;
+  selectedFile = file;
+  const img = document.getElementById('previewImg');
+  img.src = URL.createObjectURL(file);
+  document.getElementById('previewWrap').classList.add('show');
+  document.getElementById('readPhotoBtn').disabled = false;
+  document.getElementById('confirmPanel').style.display = 'none';
 }
 
-function render() {
-  if (!trip) return;
-  document.getElementById('tripPanel').style.display = '';
-  document.getElementById('legsPanel').style.display = '';
-  document.getElementById('exportBtn').disabled = false;
-  document.getElementById('infoAircraft').value = trip.aircraft || '';
-  document.getElementById('infoDate').value     = trip.date || '';
-  document.getElementById('infoName').value     = trip.name || '';
-  renderLegs();
-  updateSummary(trip);
+function setSrcBadge(id, source) {
+  const el = document.getElementById('src-' + id);
+  if (!el) return;
+  if (!source) { el.textContent = ''; el.className = 'src-badge'; return; }
+  const label = {photo: 'photo', schedule: 'schedule', 'default': 'default'}[source] || source;
+  const cls = {photo: 'photo', schedule: 'schedule', 'default': 'default'}[source] || '';
+  el.textContent = label;
+  el.className = 'src-badge ' + cls;
 }
 
-function updateSummary(t) {
-  const setText = (id, v) => document.getElementById(id).textContent = v;
-  if (!t) {
-    document.getElementById('sumHTD').value = '';
-    document.getElementById('sumLTD').value = '';
-    setText('sumToday', '—'); setText('sumTotal', '—');
-    setText('sumCycles', '—'); setText('sumTotalL', '—');
-    return;
-  }
-  const htdEl = document.getElementById('sumHTD');
-  const ltdEl = document.getElementById('sumLTD');
-  if (document.activeElement !== htdEl) htdEl.value = (parseFloat(t.hours_to_date)||0).toFixed(1);
-  if (document.activeElement !== ltdEl) ltdEl.value = t.landings_to_date || 0;
-  setText('sumToday',  t.today_hours.toFixed(1));
-  setText('sumCycles', t.today_cycles);
-  setText('sumTotal',  t.total_hours.toFixed(1));
-  setText('sumTotalL', t.total_landings);
-}
-
-function renderLegs() {
-  const tbody = document.getElementById('legsTbody');
-  const empty = document.getElementById('emptyLegs');
-  tbody.innerHTML = '';
-  if (!trip || trip.legs.length === 0) { empty.style.display=''; return; }
-  empty.style.display = 'none';
-  trip.legs.forEach(leg => {
-    const tr = document.createElement('tr');
-    tr.dataset.legId = leg.id;
-    const tenth = leg.flight_hr_tenth != null ? leg.flight_hr_tenth.toFixed(1) : '—';
-    const ftime = leg.flight_time_display || '—';
-    tr.innerHTML = `
-      <td class="leg-num">${leg.leg_number}</td>
-      <td data-label="DATE (Z)"><input class="td-input date" value="${leg.date_z||''}" placeholder="23MAY"
-           onchange="patchLeg(${leg.id},'date_z',this.value)"></td>
-      <td data-label="TIME OFF"><input class="td-input time" value="${leg.time_off||''}" placeholder="——"
-           maxlength="4" onchange="patchLeg(${leg.id},'time_off',this.value)"></td>
-      <td data-label="TIME ON"><input class="td-input time" value="${leg.time_on||''}" placeholder="——"
-           maxlength="4" onchange="patchLeg(${leg.id},'time_on',this.value)"></td>
-      <td class="calc-cell time ${leg.flight_time_display?'':'empty'}" data-label="FLT TIME">${ftime}</td>
-      <td class="calc-cell tenth ${leg.flight_hr_tenth!=null?'':'empty'}" data-label="HR/TENTH">${tenth}</td>
-      <td class="acars-cell"><button class="acars-btn" id="ab-${leg.id}" onclick="triggerAcars(${leg.id})">📷 ACARS</button></td>
-      <td class="del-cell"><button class="delete-btn" onclick="deleteLeg(${leg.id})">×</button></td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
-async function patchLeg(id, field, value) {
+async function readPhoto() {
+  if (!selectedFile) return;
+  const btn = document.getElementById('readPhotoBtn');
+  const spinner = document.getElementById('ocrSpinner');
+  btn.disabled = true;
+  spinner.classList.add('show');
   try {
-    trip = await api('PUT', `/legs/${id}`, {[field]: value});
-    const leg = trip.legs.find(l => l.id === id);
-    const tr  = document.querySelector(`tr[data-leg-id="${id}"]`);
-    if (leg && tr) {
-      const cells = tr.querySelectorAll('.calc-cell');
-      cells[0].textContent = leg.flight_time_display || '—';
-      cells[0].className = `calc-cell time ${leg.flight_time_display?'':'empty'}`;
-      cells[1].textContent = leg.flight_hr_tenth != null ? leg.flight_hr_tenth.toFixed(1) : '—';
-      cells[1].className = `calc-cell tenth ${leg.flight_hr_tenth!=null?'':'empty'}`;
-    }
-    updateSummary(trip);
-  } catch(e) { toast('Save failed', true); }
-}
+    const fd = new FormData();
+    fd.append('image', selectedFile);
+    const r = await api('POST', '/api/parse-acars', fd, true);
 
-async function addLeg() {
-  if (!trip) return;
-  try {
-    trip = await api('POST', `/trips/${trip.id}/legs`, {});
-    renderLegs(); updateSummary(trip);
-    const newLeg = trip.legs[trip.legs.length - 1];
-    if (newLeg) triggerAcars(newLeg.id);
-  } catch(e) { toast('Failed', true); }
-}
+    touched = new Set();
+    resetManualFields();
+    document.getElementById('f-date').value = r.date || '';
+    document.getElementById('f-tail').value = r.tail || '';
+    document.getElementById('f-dep').value = r.dep_airport || '';
+    document.getElementById('f-arr').value = r.arr_airport || '';
+    document.getElementById('f-off').value = r.time_off || '';
+    document.getElementById('f-on').value = r.time_on || '';
+    setSrcBadge('date', r.date_source);
+    setSrcBadge('tail', r.tail_source);
+    setSrcBadge('dep', r.dep_source);
+    setSrcBadge('arr', r.arr_source);
+    lastGndDist = r.gnd_dist;
 
-async function deleteLeg(id) {
-  if (!confirm('Delete this leg?')) return;
-  try {
-    trip = await api('DELETE', `/legs/${id}`);
-    renderLegs(); updateSummary(trip);
-  } catch(e) { toast('Failed', true); }
-}
+    applyAutocalc(r.autocalc);
 
-async function deleteAllTrips() {
-  if (!confirm('Delete ALL trips? This cannot be undone.')) return;
-  try {
-    await api('DELETE', '/trips');
-    trip = null;
-    await loadTripList();
-    document.getElementById('tripPanel').style.display = 'none';
-    document.getElementById('legsPanel').style.display = 'none';
-    document.getElementById('exportBtn').disabled = true;
-    updateSummary(null);
-    toast('All trips deleted');
-  } catch(e) { toast('Delete failed', true); }
-}
-
-function scheduleSave() {
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(saveTripInfo, 1200);
-}
-
-async function saveTripInfo() {
-  if (!trip) return;
-  try {
-    trip = await api('PUT', `/trips/${trip.id}`, {
-      aircraft:         document.getElementById('infoAircraft').value,
-      date:             document.getElementById('infoDate').value,
-      hours_to_date:    parseFloat(document.getElementById('sumHTD').value) || 0,
-      landings_to_date: parseInt(document.getElementById('sumLTD').value)   || 0,
-      name:             document.getElementById('infoName').value,
-    });
-    updateSummary(trip);
-    await loadTripList();
-    toast('Saved ✓');
-  } catch(e) { toast('Save failed', true); }
-}
-
-function openModal()  { document.getElementById('modal').classList.add('open');
-                        setTimeout(() => document.getElementById('ntHTD').focus(), 50); }
-function closeModal() { document.getElementById('modal').classList.remove('open'); }
-
-async function createTrip() {
-  try {
-    trip = await api('POST', '/trips', {
-      hours_to_date:    parseFloat(document.getElementById('ntHTD').value)  || 0,
-      landings_to_date: parseInt(document.getElementById('ntLTD').value)    || 0,
-      name:             document.getElementById('ntName').value,
-    });
-    closeModal();
-    await loadTripList();
-    document.getElementById('tripSelect').value = trip.id;
-    render();
-    toast('Trip created ✓');
-    await addLeg();
-  } catch(e) { toast('Failed', true); }
-}
-
-// ACARS
-function triggerAcars(legId) {
-  acarsLegId = legId;
-  const inp = document.getElementById('acars-file-input');
-  inp.value = ''; inp.click();
-}
-
-document.getElementById('acars-file-input').addEventListener('change', async function() {
-  if (!this.files || !this.files[0]) return;
-  const id  = acarsLegId;
-  const btn = document.getElementById(`ab-${id}`);
-  if (btn) { btn.textContent = '⏳…'; btn.classList.add('loading'); }
-  const fd = new FormData();
-  fd.append('image', this.files[0]);
-  try {
-    const res  = await fetch('/api/parse-acars', {method:'POST', body:fd});
-    const data = await res.json();
-    if (data._ocr_raw) console.log('[ACARS OCR]\n' + data._ocr_raw);
-    if (data.error) throw new Error(data.error);
-    const updates = {};
-    if (data.time_off) updates.time_off = data.time_off;
-    if (data.time_on)  updates.time_on  = data.time_on;
-    if (Object.keys(updates).length) {
-      trip = await api('PUT', `/legs/${id}`, updates);
-      renderLegs(); updateSummary(trip);
-      toast('Times loaded ✓');
+    const banner = document.getElementById('diversionBanner');
+    if (r.diversion_suspected) {
+      banner.textContent = '⚠ ' + r.diversion_note;
+      banner.classList.add('show');
     } else {
-      toast('Could not read times — enter manually', true);
+      banner.classList.remove('show');
     }
-  } catch(e) {
+
+    let note = `Read via ${r._source}.`;
+    if (r.air_dist || r.gnd_dist) note += ` Air dist ${r.air_dist ?? '—'}nm, ground dist ${r.gnd_dist ?? '—'}nm.`;
+    if (!r.time_off || !r.time_on) note += ' Could not read both times with confidence — check them.';
+    document.getElementById('ocrNote').textContent = note;
+
+    document.getElementById('confirmPanel').style.display = '';
+    document.getElementById('confirmPanel').scrollIntoView({behavior: 'smooth'});
+  } catch (e) {
     toast('OCR failed: ' + e.message, true);
   } finally {
-    const b = document.getElementById(`ab-${id}`);
-    if (b) { b.textContent = '📷 ACARS'; b.classList.remove('loading'); }
+    btn.disabled = false;
+    spinner.classList.remove('show');
   }
-});
-
-function exportCSV() {
-  if (trip) window.location.href = `/api/trips/${trip.id}/export`;
 }
 
-document.getElementById('modal').addEventListener('click', e => { if (e.target===e.currentTarget) closeModal(); });
-document.getElementById('modal').addEventListener('keydown', e => { if(e.key==='Enter') createTrip(); if(e.key==='Escape') closeModal(); });
+function markTouched(id) { touched.add(id); }
 
-loadTripList();
+function applyAutocalc(calc) {
+  if (!calc) return;
+  document.getElementById('f-total').value = calc.total_flight_time ?? '';
+  if (!touched.has('f-night-hours'))     document.getElementById('f-night-hours').value = calc.night_hours ?? 0;
+  if (!touched.has('f-night-landings'))  document.getElementById('f-night-landings').value = calc.night_landings ?? 0;
+  if (!touched.has('f-xc'))              document.getElementById('f-xc').value = calc.cross_country ?? 0;
+  if (!touched.has('f-intl'))            document.getElementById('f-intl').checked = !!calc.international;
+  if (!touched.has('f-ocean'))           document.getElementById('f-ocean').checked = !!calc.ocean_crossing;
+}
+
+function onCoreFieldChange() {
+  clearTimeout(autocalcTimer);
+  autocalcTimer = setTimeout(async () => { await maybeLookupSchedule(); recalc(); }, 300);
+}
+
+async function maybeLookupSchedule() {
+  // Neither the tail nor dep/arr are reliably on the FMS photo, so this pulls
+  // whichever of them are still blank from the ScheduleMate/PFM trip sheet —
+  // by tail+date if a tail is known, otherwise by date alone (this DB is
+  // Paul's own personal schedule, so "my only leg that day" is a safe guess).
+  // Never overwrites a field the photo or the pilot already filled in.
+  const tailEl = document.getElementById('f-tail');
+  const date = document.getElementById('f-date').value;
+  const depEl = document.getElementById('f-dep');
+  const arrEl = document.getElementById('f-arr');
+  if (!date) return;
+  if (tailEl.value.trim() && depEl.value.trim() && arrEl.value.trim()) return;
+  try {
+    const params = new URLSearchParams({date});
+    if (tailEl.value.trim()) params.set('tail', tailEl.value.trim());
+    const off = document.getElementById('f-off').value.trim();
+    if (off) params.set('time_off', off);
+    if (lastGndDist) params.set('gnd_dist', lastGndDist);
+    const r = await api('GET', '/api/pfm-lookup?' + params.toString());
+    if (!r.found) return;
+    if (!tailEl.value.trim()) { tailEl.value = r.tail; setSrcBadge('tail', 'schedule'); }
+    if (!depEl.value.trim()) { depEl.value = r.dep_airport; setSrcBadge('dep', 'schedule'); }
+    if (!arrEl.value.trim()) { arrEl.value = r.arr_airport; setSrcBadge('arr', 'schedule'); }
+    const banner = document.getElementById('diversionBanner');
+    if (r.diversion_suspected) {
+      banner.textContent = '⚠ ' + r.diversion_note;
+      banner.classList.add('show');
+    }
+  } catch (e) { /* silent — confirm table still usable without the schedule lookup */ }
+}
+
+async function recalc() {
+  const dep = document.getElementById('f-dep').value.trim();
+  const arr = document.getElementById('f-arr').value.trim();
+  const date = document.getElementById('f-date').value;
+  const off = document.getElementById('f-off').value.trim();
+  const on = document.getElementById('f-on').value.trim();
+  if (!dep || !arr || !date || !off || !on) {
+    document.getElementById('f-total').value = '';
+    return;
+  }
+  try {
+    const calc = await api('POST', '/api/autocalc', {
+      dep_airport: dep, arr_airport: arr, date, time_off: off, time_on: on,
+      taxi: parseFloat(document.getElementById('f-taxi').value || 0.3),
+    });
+    applyAutocalc(calc);
+  } catch (e) { /* silent — confirm table still usable without live recalc */ }
+}
+
+async function submitFlight() {
+  const btn = document.getElementById('submitBtn');
+  const body = {
+    date: document.getElementById('f-date').value,
+    tail: document.getElementById('f-tail').value.trim(),
+    dep_airport: document.getElementById('f-dep').value.trim(),
+    arr_airport: document.getElementById('f-arr').value.trim(),
+    time_off: document.getElementById('f-off').value.trim(),
+    time_on: document.getElementById('f-on').value.trim(),
+    role: document.getElementById('f-role').value,
+    taxi: parseFloat(document.getElementById('f-taxi').value || 0.3),
+    landings: parseInt(document.getElementById('f-landings').value || 1),
+    instrument: parseFloat(document.getElementById('f-instrument').value || 0),
+    cfi: parseFloat(document.getElementById('f-cfi').value || 0),
+    solo: parseFloat(document.getElementById('f-solo').value || 0),
+    holds: parseInt(document.getElementById('f-holds').value || 0),
+    approaches_ils: parseInt(document.getElementById('f-app-ils').value || 0),
+    approaches_gps: parseInt(document.getElementById('f-app-gps').value || 0),
+    night_hours: parseFloat(document.getElementById('f-night-hours').value || 0),
+    night_landings: parseInt(document.getElementById('f-night-landings').value || 0),
+    cross_country: parseFloat(document.getElementById('f-xc').value || 0),
+    international: document.getElementById('f-intl').checked,
+    ocean_crossing: document.getElementById('f-ocean').checked,
+    comments: document.getElementById('f-comments').value,
+  };
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+  try {
+    const r = await api('POST', '/api/flights', body);
+    if (r.push_result.status === 'created') {
+      toast(`Sent to MyFlightbook — flight #${r.mfb_flight_id}`);
+    } else if (r.push_result.status === 'duplicate') {
+      toast(`Possible duplicate of existing flight #${r.mfb_flight_id} — saved locally, not re-pushed`, true);
+    } else {
+      toast('Saved locally but MyFlightbook push failed: ' + r.push_result.message, true);
+    }
+    resetForm();
+    loadRecent();
+  } catch (e) {
+    toast('Submit failed: ' + e.message, true);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '✈ Submit to MyFlightBook';
+  }
+}
+
+function resetManualFields() {
+  // CFI/Solo/Holds/Approaches are never OCR'd or auto-computed — always start
+  // a fresh entry (photo or manual) at zero.
+  ['f-cfi', 'f-solo', 'f-holds', 'f-app-ils', 'f-app-gps'].forEach(id => document.getElementById(id).value = 0);
+}
+
+function resetForm() {
+  selectedFile = null;
+  touched = new Set();
+  lastGndDist = null;
+  resetManualFields();
+  document.getElementById('photo-input').value = '';
+  document.getElementById('camera-input').value = '';
+  document.getElementById('previewWrap').classList.remove('show');
+  document.getElementById('readPhotoBtn').disabled = true;
+  document.getElementById('confirmPanel').style.display = 'none';
+  document.getElementById('capturePanel').scrollIntoView({behavior: 'smooth'});
+}
+
+function manualEntry() {
+  selectedFile = null;
+  touched = new Set();
+  lastGndDist = null;
+  resetManualFields();
+  document.getElementById('photo-input').value = '';
+  document.getElementById('camera-input').value = '';
+  document.getElementById('previewWrap').classList.remove('show');
+
+  document.getElementById('f-date').value = new Date().toISOString().slice(0, 10);
+  ['f-tail', 'f-dep', 'f-arr', 'f-off', 'f-on', 'f-total', 'f-comments'].forEach(id => document.getElementById(id).value = '');
+  ['f-night-hours', 'f-night-landings', 'f-xc'].forEach(id => document.getElementById(id).value = 0);
+  document.getElementById('f-intl').checked = false;
+  document.getElementById('f-ocean').checked = false;
+  document.getElementById('f-taxi').value = 0.3;
+  document.getElementById('f-landings').value = 1;
+  ['date', 'tail', 'dep', 'arr'].forEach(id => setSrcBadge(id, null));
+  document.getElementById('diversionBanner').classList.remove('show');
+  document.getElementById('ocrNote').textContent = 'Manual entry — no photo read. Fill in the times and route yourself.';
+
+  document.getElementById('confirmPanel').style.display = '';
+  document.getElementById('confirmPanel').scrollIntoView({behavior: 'smooth'});
+}
+
+let faFlights = [];
+let faTail = '';
+
+function toggleFaLookup() {
+  const panel = document.getElementById('faLookupPanel');
+  const showing = panel.style.display !== 'none';
+  panel.style.display = showing ? 'none' : '';
+  if (!showing && !document.getElementById('fa-date').value) {
+    document.getElementById('fa-date').value = new Date().toISOString().slice(0, 10);
+  }
+}
+
+async function searchFlightAware() {
+  const tail = document.getElementById('fa-tail').value.trim();
+  const date = document.getElementById('fa-date').value;
+  const resultsEl = document.getElementById('faResults');
+  const spinner = document.getElementById('faSpinner');
+  if (!tail || !date) { toast('Enter a tail and date', true); return; }
+  resultsEl.innerHTML = '';
+  spinner.classList.add('show');
+  try {
+    const r = await api('GET', `/api/flightaware-lookup?tail=${encodeURIComponent(tail)}&date=${date}`);
+    faFlights = r.flights || [];
+    faTail = tail.toUpperCase();
+    if (!faFlights.length) {
+      resultsEl.innerHTML = '<div class="empty-state" style="padding:16px">No completed flights found for that tail/date</div>';
+      return;
+    }
+    resultsEl.innerHTML = faFlights.map((f, i) => `
+      <div class="fa-result" onclick="pickFlightAwareFlight(${i})">
+        <span class="fa-route">${f.dep_airport} → ${f.arr_airport}${f.aircraft_type ? ' · ' + f.aircraft_type : ''}</span>
+        <span class="fa-times">${f.time_off}Z–${f.time_on}Z</span>
+      </div>`).join('');
+  } catch (e) {
+    toast('FlightAware lookup failed: ' + e.message, true);
+  } finally {
+    spinner.classList.remove('show');
+  }
+}
+
+function pickFlightAwareFlight(i) {
+  const f = faFlights[i];
+  selectedFile = null;
+  touched = new Set();
+  lastGndDist = null;
+  resetManualFields();
+  document.getElementById('f-date').value = f.date;
+  document.getElementById('f-tail').value = faTail;
+  document.getElementById('f-dep').value = f.dep_airport;
+  document.getElementById('f-arr').value = f.arr_airport;
+  document.getElementById('f-off').value = f.time_off;
+  document.getElementById('f-on').value = f.time_on;
+  ['date', 'tail', 'dep', 'arr'].forEach(id => setSrcBadge(id, 'flightaware'));
+  document.getElementById('diversionBanner').classList.remove('show');
+  document.getElementById('ocrNote').textContent = `Imported from FlightAware${f.aircraft_type ? ' (' + f.aircraft_type + ')' : ''}.`;
+  recalc();
+  document.getElementById('confirmPanel').style.display = '';
+  document.getElementById('confirmPanel').scrollIntoView({behavior: 'smooth'});
+}
+
+function statusPillHtml(f) {
+  if (!f.mfb_status) return '';
+  const label = f.mfb_status === 'created' ? `#${f.mfb_flight_id}` : f.mfb_status;
+  return `<span class="status-pill ${f.mfb_status}">${label}</span>`;
+}
+
+async function loadRecent() {
+  try {
+    const flights = await api('GET', '/api/flights');
+    const table = document.getElementById('recentTable');
+    const tbody = document.getElementById('recentTbody');
+    const empty = document.getElementById('recentEmpty');
+    if (!flights.length) { table.style.display = 'none'; empty.style.display = ''; return; }
+    table.style.display = ''; empty.style.display = 'none';
+    tbody.innerHTML = flights.map(f => `
+      <tr>
+        <td>${f.date}</td>
+        <td>${f.dep_airport}-${f.arr_airport}</td>
+        <td>${f.tail}</td>
+        <td>${f.time_off}/${f.time_on}</td>
+        <td>${f.total_loggable_hours ?? '—'}</td>
+        <td>${statusPillHtml(f)}</td>
+      </tr>`).join('');
+  } catch (e) { /* non-fatal */ }
+}
+
+loadRecent();
 </script>
 </body>
 </html>
