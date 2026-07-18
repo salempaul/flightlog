@@ -248,8 +248,8 @@ def list_flights():
     flights = Flight.query.order_by(Flight.created_at.desc()).limit(50).all()
     return jsonify([flight_to_dict(f) for f in flights])
 
-MFB_PYTHON = '/home/paul/mfb/.venv/bin/python'
-MFB_CWD    = '/home/paul/mfb'
+MFB_CWD    = os.environ.get('MFB_CWD', os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'mfb'))
+MFB_PYTHON = os.environ.get('MFB_PYTHON', os.path.join(MFB_CWD, '.venv', 'bin', 'python'))
 
 def _push_to_mfb(flight, force=False):
     """Commits this flight to the pilot's real MyFlightbook logbook, via a

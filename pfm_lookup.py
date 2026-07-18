@@ -1,7 +1,10 @@
 import json, os, sqlite3
 from datetime import datetime
 
-PFM_DB_PATH = os.environ.get('PFM_DB_PATH', '/home/paul/ScheduleMate/pfm.db')
+PFM_DB_PATH = os.environ.get(
+    'PFM_DB_PATH',
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'ScheduleMate', 'pfm.db'),
+)
 
 
 def _sched_minutes(d):
