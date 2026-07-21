@@ -334,7 +334,7 @@
 
         <div class="field-group wide">
           <label class="field-label">Comments</label>
-          <textarea class="field-input" id="f-comments" placeholder="Notes about this flight…"></textarea>
+          <textarea class="field-input" id="f-comments" placeholder="Notes about this flight…" onchange="markTouched('f-comments')"></textarea>
         </div>
       </div>
 
@@ -431,6 +431,7 @@ async function readPhoto() {
     setSrcBadge('tail', r.tail_source);
     setSrcBadge('dep', r.dep_source);
     setSrcBadge('arr', r.arr_source);
+    if (r.crew) document.getElementById('f-comments').value = `Crew: ${r.crew}`;
     lastGndDist = r.gnd_dist;
 
     applyAutocalc(r.autocalc);
@@ -498,6 +499,10 @@ async function maybeLookupSchedule() {
     if (!tailEl.value.trim()) { tailEl.value = r.tail; setSrcBadge('tail', 'schedule'); }
     if (!depEl.value.trim()) { depEl.value = r.dep_airport; setSrcBadge('dep', 'schedule'); }
     if (!arrEl.value.trim()) { arrEl.value = r.arr_airport; setSrcBadge('arr', 'schedule'); }
+    const commentsEl = document.getElementById('f-comments');
+    if (r.crew && !touched.has('f-comments') && !commentsEl.value.trim()) {
+      commentsEl.value = `Crew: ${r.crew}`;
+    }
     const banner = document.getElementById('diversionBanner');
     if (r.diversion_suspected) {
       banner.textContent = '⚠ ' + r.diversion_note;

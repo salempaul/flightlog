@@ -761,6 +761,7 @@ def parse_acars():
             out['dep_airport'], out['dep_source'] = sched['dep_airport'], 'schedule'
         if not out['arr_airport']:
             out['arr_airport'], out['arr_source'] = sched['arr_airport'], 'schedule'
+        out['crew'] = sched.get('crew', '')
         suspected, note, _ = _diversion_check(out['dep_airport'], out['arr_airport'], out['gnd_dist'])
         if suspected:
             out['diversion_suspected'] = True

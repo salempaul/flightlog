@@ -61,6 +61,12 @@ for a tail/date. This is specific to the original author's employer
 scheduling setup — if that file doesn't exist, lookups just return `None`
 and the suggestion is silently skipped. Safe to ignore.
 
+If that database is present, a schedule match also auto-fills the Comments
+field with the rest of the crew on that leg (everyone in PFM's crew list
+except you). "You" is your last name as it appears in PFM's crew data,
+set via `PFM_SELF_LASTNAME` (defaults to `Mckee` — override this if you
+actually wire up your own PFM database).
+
 ## Running
 
 ```bash

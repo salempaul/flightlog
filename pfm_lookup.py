@@ -6,6 +6,16 @@ PFM_DB_PATH = os.environ.get(
     os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'ScheduleMate', 'pfm.db'),
 )
 
+# Last name to drop from the crew list — PFM's crew field lists everyone on
+# the leg including the pilot logging the flight, but "crew" in the comments
+# should mean everyone *else*.
+PFM_SELF_LASTNAME = os.environ.get('PFM_SELF_LASTNAME', 'Mckee')
+
+
+def _crew_excluding_self(d):
+    return ', '.join(n for n in d.get('crew', [])
+                      if n.strip().lower() != PFM_SELF_LASTNAME.strip().lower())
+
 
 def _sched_minutes(d):
     """Minutes-past-midnight-Z of the scheduled departure, or None."""
@@ -66,7 +76,7 @@ def find_scheduled_leg(tail, flight_date, time_off_hhmm=None):
         'tail': d.get('aircraft', tail),
         'dep_airport': d.get('dep_airport', ''),
         'arr_airport': d.get('arr_airport', ''),
-        'crew': d.get('crew_str', ''),
+        'crew': _crew_excluding_self(d),
     }
 
 
@@ -116,5 +126,5 @@ def find_scheduled_leg_by_date(flight_date, time_off_hhmm=None):
         'tail': d.get('aircraft', ''),
         'dep_airport': d.get('dep_airport', ''),
         'arr_airport': d.get('arr_airport', ''),
-        'crew': d.get('crew_str', ''),
+        'crew': _crew_excluding_self(d),
     }
